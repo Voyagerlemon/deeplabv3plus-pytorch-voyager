@@ -3,6 +3,7 @@ import os
 
 import torch
 import torch.nn as nn
+from attention.ca import CALayer
 import torch.utils.model_zoo as model_zoo
 
 BatchNorm2d = nn.BatchNorm2d
@@ -23,6 +24,7 @@ def conv_1x1_bn(inp, oup):
         BatchNorm2d(oup),
         nn.ReLU6(inplace=True)
     )
+
 
 #-------------------------#
 # MobileNetV2的倒残差网络
@@ -71,6 +73,8 @@ class InvertedResidual(nn.Module):
                 nn.Conv2d(hidden_dim, hidden_dim, 3, stride, 1, groups=hidden_dim, bias=False),
                 BatchNorm2d(hidden_dim),
                 nn.ReLU6(inplace=True),
+                # CA
+                CALayer(hidden_dim),
                 #---------------------------------------------#
                 # 利用1x1卷积进行通道数的下降(具备更低的运算量)
                 #---------------------------------------------#
@@ -137,6 +141,7 @@ class MobileNetV2(nn.Module):
         self.features = nn.Sequential(*self.features)
 
         self.classifier = nn.Sequential(
+            # 官方的nn.Dropout(0.1)
             nn.Dropout(0.2),
             nn.Linear(self.last_channel, n_class),
         )
