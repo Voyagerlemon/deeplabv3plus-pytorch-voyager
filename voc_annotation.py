@@ -1,8 +1,8 @@
 '''
 Author: xuhy 1727317079@qq.com
 Date: 2023-06-02 10:28:10
-LastEditors: xuhy 1727317079@qq.com
-LastEditTime: 2023-07-22 21:47:16
+LastEditors: Voyagerlemon xuhaiyangw@163.com
+LastEditTime: 2024-02-26 20:13:32
 FilePath: \deeplabv3_plus-voyager\voc_annotation.py
 Description: 划分voc数据集
 '''
@@ -24,7 +24,7 @@ train_percent       = 0.9
 #   指向VOC数据集所在的文件夹
 #   默认指向根目录下的VOC数据集
 #-------------------------------------------------------#
-VOC_path      = 'datasetsCoarse'
+VOC_path      = 'datasets'
 def mkdir(path):
     if not os.path.exists(path):
         os.makedirs(path)
