@@ -216,10 +216,10 @@ class DeepLab(nn.Module):
         #-----------------------------------#
         # 对加强特征和浅层特征加入注意力机制
         #-----------------------------------#
-        if att >= 1 and att <= 4:
-            self.aspp_attention = attention_block[att - 1](in_channels)
-            self.low_level_features_attention = attention_block[att - 1](low_level_channels)
-            self.upsample_attention = attention_block[att - 1](256)
+        # if att >= 1 and att <= 4:
+        #     self.aspp_attention = attention_block[att - 1](256)
+        #     self.decoder_attention = attention_block[att - 1](24)
+        #     self.upsample_attention = attention_block[att - 1](256)
 
         #----------------------------------#
         #   浅层特征边
@@ -253,26 +253,29 @@ class DeepLab(nn.Module):
         #---------------------------------------------#
         low_level_features, x = self.backbone(x)
         x = self.aspp(x)
+
+        # if self.att >= 1 and self.att <= 4:
+        #     # ASPP后插入CA注意力机制
+        #     x = self.aspp_attention(x)
+        #     # 解码器一开始插入
+        #     low_level_features = self.decoder_attention(low_level_features)
+
         low_level_features = self.shortcut_conv(low_level_features)
         
-        if self.att >= 1 and self.att <= 4:
-            x                  = self.aspp_attention(x)
-            low_level_features = self.low_level_features_attention(low_level_features)
-
         #-----------------------------------------#
         #   将加强特征边上采样
         #   与浅层特征堆叠后利用卷积进行特征提取
         #-----------------------------------------#
         x = F.interpolate(x, size=(low_level_features.size(2), low_level_features.size(3)), mode='bilinear', align_corners=True)
         
-        if self.att >= 1 and self.att <= 4:
-            x = self.upsample_attention(x)
         
         x = self.cat_conv(torch.cat((x, low_level_features), dim=1))
+
+        # if self.att >= 1 and self.att <= 4:
+        #     x = self.upsample_attention(x)
+            
         x = self.cls_conv(x)
         x = F.interpolate(x, size=(H, W), mode='bilinear', align_corners=True)
 
-        if self.att >= 1 and self.att <= 4:
-            x = self.upsample_attention(x)
         return x
 

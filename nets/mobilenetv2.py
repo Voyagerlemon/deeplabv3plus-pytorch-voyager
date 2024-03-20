@@ -74,7 +74,7 @@ class InvertedResidual(nn.Module):
                 BatchNorm2d(hidden_dim),
                 nn.ReLU6(inplace=True),
                 # CA
-                CALayer(hidden_dim),
+                # CALayer(hidden_dim),
                 #---------------------------------------------#
                 # 利用1x1卷积进行通道数的下降(具备更低的运算量)
                 #---------------------------------------------#

@@ -15,6 +15,11 @@ model_data/
 lfw/
 logs/
 .temp_miou_out/
+envs/
+img/
+img_out/
+miou_out_deeplabv3-plus/
+miou_out_deeplabv3-plus_CA/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

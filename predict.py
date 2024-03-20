@@ -23,14 +23,14 @@ if __name__ == "__main__":
     #   'dir_predict'       表示遍历文件夹进行检测并保存。默认遍历img文件夹，保存img_out文件夹，详情查看下方注释。
     #   'export_onnx'       表示将模型导出为onnx，需要pytorch1.7.1以上。
     #----------------------------------------------------------------------------------------------------------#
-    mode = "dir_predict"
+    mode = "predict"
     #-------------------------------------------------------------------------#
     #   count               指定了是否进行目标的像素点计数（即面积）与比例计算
     #   name_classes        区分的种类，和json_to_dataset里面的一样，用于打印种类和数量
     #
     #   count、name_classes仅在mode='predict'时有效
     #-------------------------------------------------------------------------#
-    count           = False
+    count           = True
     name_classes    = ["road", "sidewalk", "building", "wall", "fence", "pole", "traffic light", "traffic sign",
                    "vegetation", "terrain", "sky", "person", "rider", "car", "truck", "bus", "train", "motorcycle",
                    "bicycle"]
@@ -55,7 +55,7 @@ if __name__ == "__main__":
     #   test_interval和fps_image_path仅在mode='fps'有效
     #----------------------------------------------------------------------------------------------------------#
     test_interval = 100
-    fps_image_path  = "img/street.jpg"
+    fps_image_path  = "img/berlin_000002_000019_leftImg8bit.png"
     #-------------------------------------------------------------------------#
     #   dir_origin_path     指定了用于检测的图片的文件夹路径
     #   dir_save_path       指定了检测完图片的保存路径

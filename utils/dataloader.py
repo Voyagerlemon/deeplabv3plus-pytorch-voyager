@@ -23,9 +23,9 @@ class DeeplabDataset(Dataset):
         return self.length
 
     def __getitem__(self, index):
+        
         annotation_line = self.annotation_lines[index]
         name            = annotation_line.split()[0]
-
         #-------------------------------#
         #   从文件中读取图像
         #-------------------------------#
@@ -34,7 +34,7 @@ class DeeplabDataset(Dataset):
         #-------------------------------#
         #   数据增强
         #-------------------------------#
-        jpg, png    = self.get_random_data(jpg, png, self.input_shape, random = self.train)
+        jpg, png    = self.get_random_data(jpg, png, self.input_shape, name, random = self.train)
 
         jpg         = np.transpose(preprocess_input(np.array(jpg, np.float64)), [2,0,1])
         png         = np.array(png)
@@ -52,7 +52,7 @@ class DeeplabDataset(Dataset):
     def rand(self, a=0, b=1):
         return np.random.rand() * (b - a) + a
 
-    def get_random_data(self, image, label, input_shape, jitter=.3, hue=.1, sat=0.7, val=0.3, random=True):
+    def get_random_data(self, image, label, input_shape, name, jitter=.3, hue=.1, sat=0.7, val=0.3, random=True):
         image   = cvtColor(image)
         label   = Image.fromarray(np.array(label))
         #------------------------------#
@@ -89,7 +89,7 @@ class DeeplabDataset(Dataset):
             nh = int(nw/new_ar)
         image = image.resize((nw,nh), Image.BICUBIC)
         label = label.resize((nw,nh), Image.NEAREST)
-        
+        image.save(os.path.join(os.path.join("img_data_aug", "scale"), name + ".jpg"))
         #------------------------------------------#
         #   翻转图像
         #------------------------------------------#
@@ -97,6 +97,7 @@ class DeeplabDataset(Dataset):
         if flip: 
             image = image.transpose(Image.FLIP_LEFT_RIGHT)
             label = label.transpose(Image.FLIP_LEFT_RIGHT)
+            image.save(os.path.join(os.path.join("img_data_aug", "overturn"), name + ".jpg"))
         
         #------------------------------------------#
         #   将图像多余的部分加上灰条
@@ -109,6 +110,7 @@ class DeeplabDataset(Dataset):
         new_label.paste(label, (dx, dy))
         image = new_image
         label = new_label
+        image.save(os.path.join(os.path.join("img_data_aug", "occlusion"), name + ".jpg"))
 
         image_data      = np.array(image, np.uint8)
 
@@ -118,6 +120,7 @@ class DeeplabDataset(Dataset):
         blur = self.rand() < 0.25
         if blur: 
             image_data = cv2.GaussianBlur(image_data, (5, 5), 0)
+            cv2.imwrite(os.path.join(os.path.join("img_data_aug", "gaussianblur"), name + ".jpg"), image_data)
 
         #------------------------------------------#
         #   旋转
@@ -129,6 +132,7 @@ class DeeplabDataset(Dataset):
             M           = cv2.getRotationMatrix2D(center, -rotation, scale=1)
             image_data  = cv2.warpAffine(image_data, M, (w, h), flags=cv2.INTER_CUBIC, borderValue=(128,128,128))
             label       = cv2.warpAffine(np.array(label, np.uint8), M, (w, h), flags=cv2.INTER_NEAREST, borderValue=(0))
+            cv2.imwrite(os.path.join(os.path.join("img_data_aug", "spin"), name + ".jpg"), image_data)
 
         #---------------------------------#
         #   对图像进行色域变换
@@ -150,6 +154,7 @@ class DeeplabDataset(Dataset):
 
         image_data = cv2.merge((cv2.LUT(hue, lut_hue), cv2.LUT(sat, lut_sat), cv2.LUT(val, lut_val)))
         image_data = cv2.cvtColor(image_data, cv2.COLOR_HSV2RGB)
+        cv2.imwrite(os.path.join(os.path.join("img_data_aug", "gamut"), name + ".jpg"), image_data)
         
         return image_data, label
 
